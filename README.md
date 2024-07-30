@@ -1,2 +1,2 @@
 # TradeWizard
-Stock Market paper trading bot
+Stock Market Paper Trading Bot
