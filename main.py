@@ -23,8 +23,7 @@ def main():
     start_date = '2024-07-01'
     end_date = '2024-07-10'
     historical_data = data.get_historical_data(symbol, start_date, end_date)
-    time = data.is_market_open()
-    print(time)
-
+    port = data.get_portfolio()
+    print(data.calculate_portfolio_value())
 if __name__ == "__main__":
     main()
