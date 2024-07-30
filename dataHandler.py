@@ -63,3 +63,37 @@ class DataHandler:
         except Exception as e:
             print(f'Error checking market status: {e}')
             return False
+
+    def get_portfolio(self):
+        ''' #intial code to retrieve user's portfolio (output was a bit unreadable)
+        try:
+            positions = self.api.list_positions()
+            return positions
+        except Exception as e:
+            print(f'Error fetching the portfolios: {e}')
+            return None
+        '''
+        positions = self.api.list_positions()
+        portfolioData = []
+
+        for position in positions:
+            portfolioData.append({
+                'Ticker Symbol': position.symbol,
+                'Shares': position.qty,
+                'Avg Entry Price': position.avg_entry_price,
+                'Current Price': position.current_price,
+                'Market Value': position.market_value,
+                'Unrealized P/L': position.unrealized_pl,
+                'Unrealized P/L %': position.unrealized_plpc
+            })
+        return pd.DataFrame(portfolioData)
+
+    def calculate_portfolio_value(self):
+        try:
+            positions = self.api.list_positions()
+            totalValue = sum(float(position.market_value)for position in positions)
+            return totalValue
+        except Exception as e:
+            print(f'Error calculating portfolio value: {e}')
+            return None
+
