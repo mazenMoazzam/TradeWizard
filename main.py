@@ -31,6 +31,6 @@ def main():
     end_date = '2024-07-10'
     historical_data = data.get_historical_data(symbol, start_date, end_date)
     port = data.get_portfolio()
-    order.place_order('TSLA', 1, 'buy', 'market', 'gtc', '+14043885784')
+    order.place_order('RBLX', 1, 'buy', 'market', 'gtc', '+14043885784')
 if __name__ == "__main__":
     main()

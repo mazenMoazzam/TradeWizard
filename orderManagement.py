@@ -34,11 +34,17 @@ class OrderManager:
                 time_in_force=time_in_force
             )
             if notifyNumber:
-                self.send_sms_notification(
-                    notifyNumber,
-                    f'Order placed: {symbol} {side} {qty} shares at {order_type}'
-                )
-            return order
+                message = f'Order placed: {"Bought" if side == "buy" else "Sold"} {qty} {symbol} shares at {order_type}'
+                self.send_sms_notification(notifyNumber, message)
+            return {
+                'order_id': order.id,
+                'symbol': order.symbol,
+                'qty': order.qty,
+                'side': order.side,
+                'order_type': order.type,
+                'status': order.status,
+                'created_at': order.created_at
+            }
         except Exception as e:
             print(f"Error placing order: {e}")
             return None
