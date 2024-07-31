@@ -7,6 +7,7 @@ class OrderManager:
         self.api = api
         self.twilio_client = Client(twilio_sid, twilio_auth_token)
         self.twilio_phone_number = twilio_phone_number
+        self.notifyNumber = '+14043885784'
 
     def send_sms_notification(self, number, message):
         try:
@@ -20,7 +21,7 @@ class OrderManager:
             print(f'Error sending SMS notification: {e}')
             return None
 
-    def place_order(self, symbol, qty, side, order_type, time_in_force, notifyNumber = None):
+    def place_order(self, symbol, qty, side, order_type, time_in_force):
         ''' Function used to place orders (buy or sell) on stocks
             Symbol is the ticker symbol of the stock, qty is simply the amount of shares,
             side (whether you want to buy or sell)
@@ -33,9 +34,9 @@ class OrderManager:
                 type=order_type,
                 time_in_force=time_in_force
             )
-            if notifyNumber:
+            if self.notifyNumber:
                 message = f'Order placed: {"Bought" if side == "buy" else "Sold"} {qty} {symbol} shares at {order_type}'
-                self.send_sms_notification(notifyNumber, message)
+                self.send_sms_notification(self.notifyNumber, message)
             return {
                 'order_id': order.id,
                 'symbol': order.symbol,
@@ -49,10 +50,11 @@ class OrderManager:
             print(f"Error placing order: {e}")
             return None
 
-    def cancel_order(self,order_id):
+    def cancel_order(self, order_id):
         try:
             self.api.cancel_order(order_id)
-            return f'Order {order_id} has successfully been cancelled'
+            message = f'Order {order_id} has successfully been cancelled'
+            self.send_sms_notification(self.notifyNumber, message)
         except Exception as e:
             print(f'Error cancelling order: {e}')
 
@@ -95,11 +97,12 @@ class OrderManager:
     def update_order(self, order_id, qty=None, time_in_force=None):
         try:
             order = self.api.replace_order(
-                    order_id = order_id,
+                    order_id=order_id,
                     qty=qty,
                     time_in_force=time_in_force
             )
-            return order
+            message = f'Order: {order_id} has been updated successfully!'
+            self.send_sms_notification(self.notifyNumber, message)
         except Exception as e:
             print(f'Error updating order: {e}')
             return None
