@@ -46,10 +46,7 @@ class DataHandler:
     def is_market_open(self):
         try:
             clock = self.api.get_clock()
-            if clock.is_open:
-                return 'Market is currently open.'
-            else:
-                return 'Market is currently closed, will open at 9:30 A.M'
+            return clock.is_open
         except Exception as e:
             print(f'Error checking market status: {e}')
             return False
