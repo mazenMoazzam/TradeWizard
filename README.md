@@ -1,2 +1,3 @@
 # TradeWizard
-Stock Market Paper Trading Bot
+-Implemented trading logic and realtime trading as well, will implement backtesting as a feature and db functions
+-Sentiment Analysis. 
