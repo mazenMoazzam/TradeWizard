@@ -1,28 +1,18 @@
 from alpaca_trade_api.rest import REST, TimeFrame
 import pandas as pd
+import yfinance as yf
 
 class DataHandler:
     def __init__(self, api):
         self.api = api
 
     def get_historical_data(self, symbol, startDate, endDate):
-        bars = self.api.get_bars(
-            symbol,
-            TimeFrame.Day,
-            start=startDate,
-            end=endDate
-        )
+        data = yf.download(symbol, start=startDate, end=endDate)
+        print(f'Downloaded data for {symbol}:\n{data.head()}')
 
-        data = [{
-            'time': bar.t,
-            'open': bar.o,
-            'high': bar.h,
-            'low': bar.l,
-            'close': bar.c,
-            'volume': bar.v,
-            'vwap': bar.vw
-        }for bar in bars]
-        return pd.DataFrame(data)
+        data.columns = [col.lower() for col in data.columns]
+        data.reset_index(inplace=True)
+        return data
 
     def get_real_time_quote(self, symbol):
         return self.api.get_latest_trade(symbol) #gets latest real time quote with the inputted symbol from user.

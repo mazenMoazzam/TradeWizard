@@ -1,6 +1,7 @@
 from alpaca_trade_api.rest import REST, TimeFrame
 from dataHandler import DataHandler
 from orderManagement import OrderManager
+from tradingLogic import TradingLogic
 import pandas as pd
 
 
@@ -21,18 +22,8 @@ def main():
     alpacaApi = REST(apiKey, secretKey, url, api_version='v2')
     data = DataHandler(alpacaApi)
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
-
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.expand_frame_repr', False)
-
-
-    symbol = 'CI'
-    start_date = '2024-07-01'
-    end_date = '2024-07-10'
-    historical_data = data.get_historical_data(symbol, start_date, end_date)
-    port = data.get_portfolio()
-    id = 'e9276ff7-1547-46c6-bd27-7762acd2af27'
-    print(order.get_cash())
-
+    portfolio = [('AAPL', 10), ('GOOG', 5), ('MSFT', 15)]
+    logic = TradingLogic(data, order, portfolio)
+    print(data.is_market_open())
 if __name__ == "__main__":
     main()
