@@ -22,8 +22,8 @@ def main():
     alpacaApi = REST(apiKey, secretKey, url, api_version='v2')
     data = DataHandler(alpacaApi)
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
-    portfolio = [('AAPL', 10), ('GOOG', 5), ('MSFT', 15)]
-    logic = TradingLogic(data, order, portfolio)
-    print(data.is_market_open())
+    portfolio = [('AAPL', 1), ('GOOG', 2), ('MSFT', 1)]
+    logic = TradingLogic(alpacaApi, data, order, portfolio)
+    logic.start_trading()
 if __name__ == "__main__":
     main()
