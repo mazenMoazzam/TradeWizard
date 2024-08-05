@@ -1,5 +1,6 @@
 from alpaca_trade_api.rest import REST, TimeFrame
 from twilio.rest import Client
+from models import Order, session
 
 
 class OrderManager:
@@ -37,6 +38,19 @@ class OrderManager:
             if self.notifyNumber:
                 message = f'Order placed: {"Bought" if side == "buy" else "Sold"} {qty} {symbol} shares at {order_type}'
                 self.send_sms_notification(self.notifyNumber, message)
+
+            db_order = Order(
+                id=order.id,
+                symbol=order.symbol,
+                qty=order.qty,
+                side=order.side,
+                order_type=order.type,
+                status=order.status,
+                created_at=order.created_at,
+                filled_at=None
+            )
+            session.add(db_order)
+            session.commit()
             return {
                 'order_id': order.id,
                 'symbol': order.symbol,
@@ -145,5 +159,12 @@ class OrderManager:
             print(f'Error getting order details: {e}')
             return None
 
+    def fetch_orders_from_db(self):
+        try:
+            orders = session.query(Order).all()
+            for order in orders:
+                print(f'Order ID: {order.id}, Symbol: {order.symbol}, Quantity: {order.qty}, Side: {order.side}, Type: {order.type}')
+        except Exception as e:
+            print(f'Error fetching orders: {e}')
 
 
