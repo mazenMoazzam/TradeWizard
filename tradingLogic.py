@@ -1,12 +1,13 @@
 import pandas as pd
 import time
+import logging
 from alpaca_trade_api.rest import REST, TimeFrame
 from alpaca_trade_api.stream import Stream
-import tweepy
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class TradingLogic:
-    def __init__(self, api, dataHandler, orderManager, portfolio, rsi_period=14, rsi_overbought=70, rsi_oversold=30, trading_interval=60, volume_threshold=1000000):
+    def __init__(self, api, dataHandler, orderManager, portfolio, rsi_period=14, rsi_overbought=70, rsi_oversold=30, trading_interval=60):
         self.api = api
         self.dataHandler = dataHandler
         self.orderManager = orderManager
@@ -15,18 +16,17 @@ class TradingLogic:
         self.rsi_overbought = rsi_overbought
         self.rsi_oversold = rsi_oversold
         self.trading_interval = trading_interval
-        self.volume_threshold = volume_threshold
 
     def calculate_rsi(self, close_prices):
-        closePrices = pd.to_numeric(close_prices, errors='coerce')
-        delta = closePrices.diff()
-        print(f"Price Changes (delta):\n{delta.head()}")
+        close_prices = pd.to_numeric(close_prices, errors='coerce')
+        delta = close_prices.diff()
+        logging.info(f"Price Changes (delta):\n{delta.head()}")
 
         gain = (delta.where(delta > 0, 0)).rolling(window=self.rsi_period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period).mean()
 
-        print(f"Average Gains:\n{gain.head()}")
-        print(f"Average Losses:\n{loss.head()}")
+        logging.info(f"Average Gains:\n{gain.head()}")
+        logging.info(f"Average Losses:\n{loss.head()}")
 
         gain = gain.fillna(0)
         loss = loss.fillna(0)
@@ -35,20 +35,21 @@ class TradingLogic:
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
 
-        print(f"RS:\n{rs.head()}")
-        print(f"RSI:\n{rsi.head()}")
+        logging.info(f"RS:\n{rs.head()}")
+        logging.info(f"RSI:\n{rsi.head()}")
+
         return rsi
 
     def start_trading(self):
         while True:
             marketOpen = self.dataHandler.is_market_open()
-            print(f"Market Open Status: {marketOpen}")
+            logging.info(f"Market Open Status: {marketOpen}")
             if marketOpen:
-                print("Market is open. Starting trading...")
+                logging.info("Market is open. Starting trading...")
                 for symbol, qty in self.portfolio:
                     self.trading_logic(symbol, qty)
             else:
-                print("Market is closed. Waiting for the market to open...")
+                logging.info("Market is closed. Waiting for the market to open...")
 
             time.sleep(self.trading_interval)
 
@@ -60,47 +61,45 @@ class TradingLogic:
             endDate = pd.Timestamp.now(tz='America/New_York')
             startDate = endDate - pd.Timedelta(days=365)
 
-            historicalData = self.dataHandler.get_historical_data(symbol, startDate.strftime('%Y-%m-%d'),
+            historical_data = self.dataHandler.get_historical_data(symbol, startDate.strftime('%Y-%m-%d'),
                                                                    endDate.strftime('%Y-%m-%d'))
 
-            if historicalData.empty:
-                print(f"No data returned for {symbol}. Skipping...")
+            if historical_data.empty:
+                logging.warning(f"No data returned for {symbol}. Skipping...")
                 return
 
-            print(f"Data Length for {symbol}: {len(historicalData)}")
-            print(historicalData.head())
+            logging.info(f"Data Length for {symbol}: {len(historical_data)}")
+            logging.info(historical_data.head())
 
-            if len(historicalData) < self.rsi_period:
-                print(f"Not enough data to calculate RSI for {symbol}. Skipping...")
+            if len(historical_data) < self.rsi_period:
+                logging.warning(f"Not enough data to calculate RSI for {symbol}. Skipping...")
                 return
 
-            historicalData['rsi'] = self.calculate_rsi(historicalData['close'])
+            historical_data['rsi'] = self.calculate_rsi(historical_data['close'])
 
-            if historicalData['rsi'].isnull().values.any():
-                print(f"RSI could not be calculated properly for {symbol}. Skipping...")
+            if historical_data['rsi'].isnull().values.any():
+                logging.warning(f"RSI could not be calculated properly for {symbol}. Skipping...")
                 return
 
-            print(f"RSI for {symbol}:")
-            print(historicalData[['rsi']].tail())
+            logging.info(f"RSI for {symbol}:")
+            logging.info(historical_data[['rsi']].tail())
 
-            latestRsi = historicalData['rsi'].iloc[-1]
-            latestVolume = historicalData['volume'].iloc[-1]
-            print(f"Latest RSI for {symbol}: {latestRsi}")
-            print(f"Latest Volume for {symbol}: {latestVolume}")
+            latest_rsi = historical_data['rsi'].iloc[-1]
+            latest_volume = historical_data['volume'].iloc[-1]
+            average_volume = historical_data['volume'].rolling(window=self.rsi_period).mean().iloc[-1]
 
-            if latestVolume > self.volume_threshold:
-                if latestRsi < self.rsi_oversold:
-                    self.orderManager.place_order(symbol, qty, 'buy', 'market', 'gtc')
-                    print(f"Buy Signal for {symbol} based on RSI and Volume - Placing order for {qty} shares")
-                elif latestRsi > self.rsi_overbought:
-                    current_positions = self.orderManager.get_positions()
-                    if any(pos['symbol'] == symbol and int(pos['qty']) >= qty for pos in current_positions):
-                        self.orderManager.place_order(symbol, qty, 'sell', 'market', 'gtc')
-                        print(f"Sell Signal for {symbol} based on RSI and Volume - Placing order for {qty} shares")
-                    else:
-                        print(f"Sell Signal for {symbol} but insufficient quantity to sell")
+            logging.info(f"Latest RSI for {symbol}: {latest_rsi}")
+            logging.info(f"Latest Volume for {symbol}: {latest_volume}")
+            logging.info(f"Average Volume for {symbol}: {average_volume}")
+
+            if latest_rsi < self.rsi_oversold and latest_volume > average_volume:
+                self.orderManager.place_order(symbol, qty, 'buy', 'market', 'gtc')
+                logging.info(f"Buy Signal for {symbol} based on RSI and Volume - Placing order for {qty} shares")
+            elif latest_rsi > self.rsi_overbought and symbol in ownedStocks and ownedStocks[symbol] >= qty:
+                self.orderManager.place_order(symbol, qty, 'sell', 'market', 'gtc')
+                logging.info(f"Sell Signal for {symbol} based on RSI and Volume - Placing order for {qty} shares")
             else:
-                print(f"Volume threshold not met for {symbol}. No trade executed.")
+                logging.info(f"No valid trading signal for {symbol} at this time.")
 
         except Exception as e:
-            print(f"Error in trading logic for {symbol}: {e}")
+            logging.error(f"Error in trading logic for {symbol}: {e}")
