@@ -9,5 +9,6 @@ TO-DO:
 - Monitor and logging of trades or all actions. (COMPLETE)
 - Sentiment analysis (still pending), possibly use twitter api to fetch tweets about certain stocks or use webscraper, and use VADER to
   perform the analysis and return the sentiment score, from this, a feature to perform a trade can occur (STILL PENDING)
+
 - Deploy into a web application, primarily using Flask and Django, create a website and send http requests to api/server,
-  to interact with bot.
+  to interact with bot (pending). 
