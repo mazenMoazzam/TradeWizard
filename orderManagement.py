@@ -67,8 +67,14 @@ class OrderManager:
     def cancel_order(self, order_id):
         try:
             self.api.cancel_order(order_id)
-            message = f'Order {order_id} has successfully been cancelled'
-            self.send_sms_notification(self.notifyNumber, message)
+            order = session.query(Order).filter(Order.id == order_id).first()
+            if order:
+                order.status = 'canceled'
+                session.commit()
+                message = f'Order {order_id} has successfully been cancelled'
+                self.send_sms_notification(self.notifyNumber, message)
+            else:
+                print(f'Order {order_id} not found in database')
         except Exception as e:
             print(f'Error cancelling order: {e}')
 
@@ -163,7 +169,7 @@ class OrderManager:
         try:
             orders = session.query(Order).all()
             for order in orders:
-                print(f'Order ID: {order.id}, Symbol: {order.symbol}, Quantity: {order.qty}, Side: {order.side}, Type: {order.type}')
+                print(f'Order ID: {order.id}, Symbol: {order.symbol}, Quantity: {order.qty}, Status: {order.status}')
         except Exception as e:
             print(f'Error fetching orders: {e}')
 
