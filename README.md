@@ -5,3 +5,5 @@
 -Automated Trading: Uses RSI (Relative Strength Index) to determine buy and sell signals.
 -Real-Time Data Streaming: Subscribes to real-time stock updates and processes them.
 -Order Management: Places, cancels, and updates orders. Keeps track and stores them in a database. 
+-Database Logging: Stores order and trade information in a SQLite database.
+-SMS Automation/Notifications: Sends SMS notifications for order placement, updates, and cancellations.
