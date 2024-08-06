@@ -23,6 +23,8 @@ def main():
     data = DataHandler(alpacaApi)
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
     portfolio = [('AAPL', 1), ('GOOG', 2), ('MSFT', 1)]
-    order.fetch_orders_from_db()
+    trading = TradingLogic(alpacaApi, data, order, portfolio)
+    trading.start_trading()
+
 if __name__ == "__main__":
     main()
