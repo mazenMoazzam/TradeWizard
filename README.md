@@ -5,7 +5,7 @@
 -Automated Trading: Uses RSI (Relative Strength Index) to determine buy and sell signals.
 
 
--Real-Time Data Streaming: Subscribes to real-time stock updates and processes them.
+-Real-Time Data Streaming/Trading: Subscribes to real-time stock updates and processes them. Trades stocks in real-time.
 
 
 -Order Management: Places, cancels, and updates orders. Keeps track and stores them in a database. 
