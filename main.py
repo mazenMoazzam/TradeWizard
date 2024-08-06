@@ -22,9 +22,9 @@ def main():
     alpacaApi = REST(apiKey, secretKey, url, api_version='v2')
     data = DataHandler(alpacaApi)
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
-    portfolio = [('AAPL', 1), ('GOOG', 2), ('MSFT', 1)]
+    portfolio = [('NFLX', 2)]
     trading = TradingLogic(alpacaApi, data, order, portfolio)
-    trading.start_trading()
 
+    order.fetch_orders_from_db()
 if __name__ == "__main__":
     main()
