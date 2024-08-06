@@ -27,7 +27,7 @@ class TradingLogic:
 
         gain = gain.fillna(0)
         loss = loss.fillna(0)
-        loss = loss.replace(0, 0.01)  # Avoid division by zero
+        loss = loss.replace(0, 0.01)
 
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
