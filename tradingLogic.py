@@ -1,6 +1,10 @@
 import pandas as pd
 import time
 import logging
+
+import requests
+from bs4 import BeautifulSoup
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from alpaca_trade_api.rest import REST, TimeFrame
 from alpaca_trade_api.stream import Stream
 
@@ -16,6 +20,8 @@ class TradingLogic:
         self.rsi_overbought = rsi_overbought
         self.rsi_oversold = rsi_oversold
         self.trading_interval = trading_interval
+        self.sentiment_analyzer = SentimentIntensityAnalyzer()
+
 
     def calculate_rsi(self, close_prices):
         close_prices = pd.to_numeric(close_prices, errors='coerce')
@@ -103,3 +109,19 @@ class TradingLogic:
 
         except Exception as e:
             logging.error(f"Error in trading logic for {symbol}: {e}")
+
+    def getSentimentScore(self, symbol):
+        url = f'https://finance.yahoo.com/quote/{symbol}/news/'
+        response = requests.get(url)
+        soupScraper = BeautifulSoup(response.text, 'html.parser')
+        headLines = soupScraper.find_all('h3', class_='Mb(5px)')
+        combinedText = ' '.join([headLine.get_text() for headLine in headLines])
+
+        print(f"Extracted headlines for {symbol}:")
+        for headline in headLines:
+            print(headline.get_text()) #estbalished a for loop to see if web scraper actually extracts information for debugging
+            #purposes.
+        sentimentScore = self.sentiment_analyzer.polarity_scores(combinedText)
+        logging.info(f'Sentiment Analysis for {symbol} headlines: {sentimentScore}')
+
+        return sentimentScore['compound']
