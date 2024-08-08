@@ -119,7 +119,7 @@ class TradingLogic:
 
         print(f"Extracted headlines for {symbol}:")
         for headline in headLines:
-            print(headline.get_text()) #estbalished a for loop to see if web scraper actually extracts information for debugging
+            print(headline.get_text()) #established a for loop to see if web scraper actually extracts information for debugging
             #purposes.
         sentimentScore = self.sentiment_analyzer.polarity_scores(combinedText)
         logging.info(f'Sentiment Analysis for {symbol} headlines: {sentimentScore}')
