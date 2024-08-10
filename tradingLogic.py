@@ -10,8 +10,10 @@ from alpaca_trade_api.stream import Stream
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class TradingLogic:
-    def __init__(self, api, dataHandler, orderManager, portfolio, rsi_period=14, rsi_overbought=70, rsi_oversold=30, trading_interval=60):
+    def __init__(self, api, dataHandler, orderManager, portfolio, rsi_period=14, rsi_overbought=70, rsi_oversold=30,
+                 trading_interval=60):
         self.api = api
         self.dataHandler = dataHandler
         self.orderManager = orderManager
@@ -22,17 +24,16 @@ class TradingLogic:
         self.trading_interval = trading_interval
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
 
-
     def calculate_rsi(self, close_prices):
         close_prices = pd.to_numeric(close_prices, errors='coerce')
         delta = close_prices.diff()
-        logging.info(f"Price Changes (delta):\n{delta.head()}")
+        logging.info(f"Price Changes (delta):\n{delta}")
 
         gain = (delta.where(delta > 0, 0)).rolling(window=self.rsi_period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period).mean()
 
-        logging.info(f"Average Gains:\n{gain.head()}")
-        logging.info(f"Average Losses:\n{loss.head()}")
+        logging.info(f"Average Gains:\n{gain}")
+        logging.info(f"Average Losses:\n{loss}")
 
         gain = gain.fillna(0)
         loss = loss.fillna(0)
@@ -41,8 +42,8 @@ class TradingLogic:
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
 
-        logging.info(f"RS:\n{rs.head()}")
-        logging.info(f"RSI:\n{rsi.head()}")
+        logging.info(f"RS:\n{rs}")
+        logging.info(f"RSI:\n{rsi}")
 
         return rsi
 
@@ -119,8 +120,9 @@ class TradingLogic:
 
         print(f"Extracted headlines for {symbol}:")
         for headline in headLines:
-            print(headline.get_text()) #established a for loop to see if web scraper actually extracts information for debugging
-            #purposes.
+            print(headline.get_text())  # established a for loop to see if web scraper actually extracts information
+            # for debugging
+            # purposes.
         sentimentScore = self.sentiment_analyzer.polarity_scores(combinedText)
         logging.info(f'Sentiment Analysis for {symbol} headlines: {sentimentScore}')
 
