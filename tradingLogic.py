@@ -112,18 +112,23 @@ class TradingLogic:
             logging.error(f"Error in trading logic for {symbol}: {e}")
 
     def getSentimentScore(self, symbol):
-        url = f'https://finance.yahoo.com/quote/{symbol}/news/'
+        apiKEY = 'd0caeaf1a3f147be96729c70fd9ea607'
+        url = f'https://newsapi.org/v2/everything?q={symbol}&apiKey={apiKEY}'
         response = requests.get(url)
-        soupScraper = BeautifulSoup(response.text, 'html.parser')
-        headLines = soupScraper.find_all('h3', class_='Mb(5px)')
-        combinedText = ' '.join([headLine.get_text() for headLine in headLines])
 
-        print(f"Extracted headlines for {symbol}:")
-        for headline in headLines:
-            print(headline.get_text())  # established a for loop to see if web scraper actually extracts information
-            # for debugging
-            # purposes.
+        if response.status_code != 200:
+            logging.error(f"Failed to get news for {symbol}: Status code {response.status_code}")
+            return None
+
+        articles = response.json().get('articles', [])
+        combinedText = ' '.join(
+            (article.get('title') or '') + ' ' + (article.get('description') or '')
+            for article in articles
+        )
+
+        if not combinedText.strip():
+            logging.warning(f"No text available for sentiment analysis for {symbol}.")
+            return None
         sentimentScore = self.sentiment_analyzer.polarity_scores(combinedText)
         logging.info(f'Sentiment Analysis for {symbol} headlines: {sentimentScore}')
-
         return sentimentScore['compound']
