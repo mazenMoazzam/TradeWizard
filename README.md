@@ -17,7 +17,5 @@
 -SMS Automation/Notifications: Sends SMS notifications for order placement, updates, and cancellations.
 
 
--Sentiment Analysis: Returns a sentiment score regarding any stock via ticker symbol. Achieved using News API and BeautifulSoup to fetch social media articles/news regarding a stock, and
-
-returns a sentiment score using VADER. 
+-Sentiment Analysis: Returns a sentiment score regarding any stock via ticker symbol. Achieved using News API and BeautifulSoup to fetch social media articles/news regarding a stock, and returns a sentiment score using VADER. 
 
