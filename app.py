@@ -2,14 +2,18 @@ from flask import Flask, request, jsonify
 from dataHandler import DataHandler
 from alpaca_trade_api.rest import REST, TimeFrame
 from orderManagement import OrderManager
+from dotenv  import load_dotenv
+import os
 
-apiKey = 'PKG126Z4K4SABUBFSYBG'
-secretKey = '2KdUrhkh83ZTZc24AtmU1Lc79HlcaQtERLZhwDrE'
-url = 'https://paper-api.alpaca.markets'
 
-twilio_sid = 'ACd08d4a99a3a12582ad7d30f50c3dd575'
-twilio_auth_token = '7084ed704ff6dcc47d2d9e87330324d4'
-twilio_phone_number = '+18772741628'
+load_dotenv()
+apiKey = os.getenv('API_KEY')
+secretKey = os.getenv('SECRET_KEY')
+url = os.getenv('URL')
+
+twilio_sid = os.getenv('TWILIO_SID')
+twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
 alpacaApi = REST(apiKey, secretKey, url, api_version='v2')
 
