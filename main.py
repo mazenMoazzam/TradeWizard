@@ -7,10 +7,6 @@ import os
 
 load_dotenv()
 
-# apiKey = 'PKG126Z4K4SABUBFSYBG'
-# secretKey = '2KdUrhkh83ZTZc24AtmU1Lc79HlcaQtERLZhwDrE' to keep for reference.
-# url = 'https://paper-api.alpaca.markets'
-
 apiKey = os.getenv('API_KEY')
 secretKey = os.getenv('SECRET_KEY')
 url = os.getenv('URL')
