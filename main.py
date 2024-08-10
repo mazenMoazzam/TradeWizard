@@ -24,6 +24,6 @@ def main():
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
     portfolio = [('LMT', 1)]
     trading = TradingLogic(alpacaApi, data, order, portfolio)
-    order.fetch_orders_from_db()
+    order.place_order('AAPL', 1, 'buy', 'market', 'gtc')
 if __name__ == "__main__":
     main()
