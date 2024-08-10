@@ -2,6 +2,7 @@ from alpaca_trade_api.rest import REST, TimeFrame
 import pandas as pd
 import yfinance as yf
 
+
 class DataHandler:
     def __init__(self, api):
         self.api = api
@@ -15,7 +16,7 @@ class DataHandler:
         return data
 
     def get_real_time_quote(self, symbol):
-        return self.api.get_latest_trade(symbol) #gets latest real time quote with the inputted symbol from user.
+        return self.api.get_latest_trade(symbol)  # gets recent real time quote with the inputted symbol from user.
 
     def get_current_price(self, symbol: str):
         try:
@@ -32,7 +33,7 @@ class DataHandler:
             start=startDate,
             end=endDate
         )
-        data= [{
+        data = [{
             'time': bar.t,
             'open': bar.o,
             'high': bar.h,
@@ -78,9 +79,8 @@ class DataHandler:
     def calculate_portfolio_value(self):
         try:
             positions = self.api.list_positions()
-            totalValue = sum(float(position.market_value)for position in positions)
+            totalValue = sum(float(position.market_value) for position in positions)
             return totalValue
         except Exception as e:
             print(f'Error calculating portfolio value: {e}')
             return None
-
