@@ -2,18 +2,22 @@ from alpaca_trade_api.rest import REST, TimeFrame
 from dataHandler import DataHandler
 from orderManagement import OrderManager
 from tradingLogic import TradingLogic
+from dotenv  import load_dotenv
+import os
+
+load_dotenv()
 
 # apiKey = 'PKG126Z4K4SABUBFSYBG'
 # secretKey = '2KdUrhkh83ZTZc24AtmU1Lc79HlcaQtERLZhwDrE' to keep for reference.
 # url = 'https://paper-api.alpaca.markets'
 
-apiKey = 'PKG126Z4K4SABUBFSYBG'
-secretKey = '2KdUrhkh83ZTZc24AtmU1Lc79HlcaQtERLZhwDrE'
-url = 'https://paper-api.alpaca.markets'
+apiKey = os.getenv('API_KEY')
+secretKey = os.getenv('SECRET_KEY')
+url = os.getenv('URL')
 
-twilio_sid = 'AC8be78dea1f6134d36b5682bdf46e176e'
-twilio_auth_token = '19aa62b8a83555641e5f70a42e031b80'
-twilio_phone_number = '+18888713828'
+twilio_sid = os.getenv('TWILIO_SID')
+twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
 
 def main():
