@@ -121,6 +121,16 @@ class OrderManager:
                     qty=qty,
                     time_in_force=time_in_force
             )
+            dbOrder = session.query(Order).filter(Order.id == order.id).first()
+            if not dbOrder:
+                print(f'Order {order_id} was not found in the database')
+                return None
+            if qty is not None:
+                dbOrder.qty = qty
+            if time_in_force is not None:
+                dbOrder.time_in_force = time_in_force
+
+            session.commit()
             message = f'Order: {order_id} has been updated successfully!'
             self.send_sms_notification(self.notifyNumber, message)
         except Exception as e:
