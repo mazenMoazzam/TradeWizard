@@ -7,6 +7,10 @@ from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from alpaca_trade_api.rest import REST, TimeFrame
 from alpaca_trade_api.stream import Stream
+from dotenv  import load_dotenv
+import os
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -112,8 +116,8 @@ class TradingLogic:
             logging.error(f"Error in trading logic for {symbol}: {e}")
 
     def getSentimentScore(self, symbol):
-        apiKEY = 'd0caeaf1a3f147be96729c70fd9ea607'
-        url = f'https://newsapi.org/v2/everything?q={symbol}&apiKey={apiKEY}'
+        newsApiKey = os.getenv('NEWS_API_KEY')
+        url = f'https://newsapi.org/v2/everything?q={symbol}&apiKey={newsApiKey}'
         response = requests.get(url)
 
         if response.status_code != 200:
