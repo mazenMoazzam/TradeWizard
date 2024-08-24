@@ -52,7 +52,7 @@ class DataHandler:
             print(f'Error checking market status: {e}')
             return False
 
-    def get_portfolio(self):
+    def get_positions(self):
         ''' #intial code to retrieve user's portfolio (output was a bit unreadable)
         try:
             positions = self.api.list_positions()

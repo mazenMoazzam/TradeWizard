@@ -1,7 +1,6 @@
 import pandas as pd
 import time
 import logging
-
 import requests
 from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -38,12 +37,7 @@ class TradingLogic:
 
         logging.info(f"Average Gains:\n{gain}")
         logging.info(f"Average Losses:\n{loss}")
-
-        gain = gain.fillna(0)
-        loss = loss.fillna(0)
-        loss = loss.replace(0, 0.01)
-
-        rs = gain / loss
+        rs = gain / loss.replace(0, 0.01)
         rsi = 100 - (100 / (1 + rs))
 
         logging.info(f"RS:\n{rs}")
