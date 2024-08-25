@@ -38,3 +38,12 @@ class TradingBot:
         """Log cash balance."""
         cash_balance = self.order_manager.get_cash()
         print(f"Cash balance:\n{cash_balance}")
+
+    def place_order(self, symbol, qty, side, order_type='market', time_in_force='gtc'):
+        """Place an order using OrderManager."""
+        try:
+            self.order_manager.place_order(symbol, qty, side, order_type, time_in_force)
+            print(
+                f"Order placed: {side} {qty} shares of {symbol} with {order_type} order and {time_in_force} time in force.")
+        except Exception as e:
+            print(f"Error placing order: {e}")

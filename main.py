@@ -3,7 +3,10 @@ from dataHandler import DataHandler
 from orderManagement import OrderManager
 from tradingLogic import TradingLogic
 from dotenv  import load_dotenv
+from tradingBot import TradingBot
 import os
+import asyncio
+
 
 load_dotenv()
 
@@ -22,7 +25,17 @@ def main():
     order = OrderManager(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number)
     portfolio = [('TSLA', 1), ('AMZN', 1)]
     trading = TradingLogic(alpacaApi, data, order, portfolio)
-    order.fetch_orders_from_db()
+    portfolio = []
+    bot = TradingBot(alpacaApi, twilio_sid, twilio_auth_token, twilio_phone_number, portfolio)
+    symbols = ['AAPL', 'GOOG']
+
+    async def run():
+        result = await data.start_streaming(symbols)
+        print(result)
+
+    asyncio.run(run())
+
+
 
 if __name__ == "__main__":
     main()

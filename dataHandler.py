@@ -1,11 +1,18 @@
 from alpaca_trade_api.rest import REST, TimeFrame
 import pandas as pd
 import yfinance as yf
+from alpaca_trade_api.stream import Stream
+import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 
 class DataHandler:
     def __init__(self, api):
         self.api = api
+        self.stream=None
 
     def get_historical_data(self, symbol, startDate, endDate):
         data = yf.download(symbol, start=startDate, end=endDate)
@@ -84,3 +91,40 @@ class DataHandler:
         except Exception as e:
             print(f'Error calculating portfolio value: {e}')
             return None
+    async def on_trade_update(self, trade):
+        print(f"New trade: {trade}")
+
+    async def on_quote_update(self, quote):
+        print(f"New quote: {quote}")
+
+    async def start_streaming(self, symbols):
+        if not self.is_market_open():
+            logging.info('Market is closed, streaming cannot be done at this time.')
+            return 'Market is closed, streaming cannot be done at this time.'
+
+        if self.stream is None:
+            self.stream = Stream(
+                key_id=self.api._key_id,
+                secret_key=self.api._secret_key,
+                base_url=self.api._base_url,
+                data_feed='iex'
+            )
+
+            for symbol in symbols:
+                self.stream.subscribe_trades(self.on_trade_update, symbol)
+                self.stream.subscribe_quotes(self.on_quote_update, symbol)
+
+            logging.info(f'Subscribed to trades and quotes for: {symbols}')
+
+            # Run the stream asynchronously
+            try:
+                await self.stream._run_forever()
+            except KeyboardInterrupt:
+                logging.info("Streaming stopped manually.")
+        else:
+            logging.info("Stream is already running.")
+
+    def stop_streaming(self):
+        if self.stream:
+            self.stream.close()
+            print("Stopped streaming")
