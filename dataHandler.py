@@ -116,7 +116,6 @@ class DataHandler:
 
             logging.info(f'Subscribed to trades and quotes for: {symbols}')
 
-            # Run the stream asynchronously
             try:
                 await self.stream._run_forever()
             except KeyboardInterrupt:
