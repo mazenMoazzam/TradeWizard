@@ -110,23 +110,25 @@ class TradingLogic:
             logging.error(f"Error in trading logic for {symbol}: {e}")
 
     def getSentimentScore(self, symbol):
-        newsApiKey = os.getenv('NEWS_API_KEY')
-        url = f'https://newsapi.org/v2/everything?q={symbol}&apiKey={newsApiKey}'
-        response = requests.get(url)
+        url = f'https://finance.yahoo.com/quote/{symbol}/news/'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        } #headers defined to avoid getting request blocked from yahoo finance.
+        response = requests.get(url, headers=headers) #get request to obtain website contents.
 
         if response.status_code != 200:
             logging.error(f"Failed to get news for {symbol}: Status code {response.status_code}")
             return None
 
-        articles = response.json().get('articles', [])
-        combinedText = ' '.join(
-            (article.get('title') or '') + ' ' + (article.get('description') or '')
-            for article in articles
-        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        titles = [title.get_text(strip=True) for title in soup.find_all('h3')]
+        #scrapes all article headers/titles in the website.
 
-        if not combinedText.strip():
-            logging.warning(f"No text available for sentiment analysis for {symbol}.")
+        if not titles:
+            logging.warning(f"No article titles available for sentiment analysis for {symbol}.")
             return None
+
+        combinedText = ' '.join(titles) #combines all  scraped article titles into one string to be processed.
         sentimentScore = self.sentiment_analyzer.polarity_scores(combinedText)
         logging.info(f'Sentiment Analysis for {symbol} headlines: {sentimentScore}')
-        return sentimentScore['compound']
+        return sentimentScore['compound'] #returns compound score ranging from -1 to 1.

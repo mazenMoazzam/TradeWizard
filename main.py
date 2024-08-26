@@ -33,7 +33,8 @@ def main():
         result = await data.start_streaming(symbols)
         print(result)
 
-    asyncio.run(run())
+    score = trading.getSentimentScore('TSLA')
+    print(score)
 
 
 
