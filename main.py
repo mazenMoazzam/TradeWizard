@@ -33,7 +33,7 @@ def main():
         result = await data.start_streaming(symbols)
         print(result)
 
-    score = trading.getSentimentScore('TSLA')
+    score = trading.getSentimentScore('RBLX')
     print(score)
 
 

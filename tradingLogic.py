@@ -122,7 +122,7 @@ class TradingLogic:
 
         soup = BeautifulSoup(response.content, 'html.parser')
         titles = [title.get_text(strip=True) for title in soup.find_all('h3')]
-        #scrapes all article headers/titles in the website.
+        #scrapes all article headers/titles in the website (includes h3 tag).
 
         if not titles:
             logging.warning(f"No article titles available for sentiment analysis for {symbol}.")
