@@ -39,6 +39,7 @@ def place_order():
         return jsonify({'status': 'error', 'message': 'Failed to place order'}), 400
 
 if __name__ == '__main__':
+
     app.run(debug=True)
 
 
