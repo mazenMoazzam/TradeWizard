@@ -33,8 +33,10 @@ def main():
         result = await data.start_streaming(symbols)
         print(result)
 
-    score = trading.getSentimentScore('RBLX')
-    print(score)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
+
+
 
 
 
