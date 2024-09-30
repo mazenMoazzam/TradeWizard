@@ -1,6 +1,10 @@
 from alpaca_trade_api.rest import REST, TimeFrame
 from twilio.rest import Client
 from models import Order, session
+from functools import lru_cache
+import cachetools
+import time
+
 
 
 class OrderManager:
@@ -9,6 +13,7 @@ class OrderManager:
         self.twilio_client = Client(twilio_sid, twilio_auth_token)
         self.twilio_phone_number = twilio_phone_number
         self.notifyNumber = '+14043885784'
+        self.cache = cachetools.TTLCache(maxsize=100, ttl=3600)
 
     def send_sms_notification(self, number, message):
         try:
@@ -85,7 +90,7 @@ class OrderManager:
         except Exception as e:
             print(f'Error listing the orders: {e}')
             return None
-
+    @lru_cache(maxsize=100)
     def get_account_info(self):
         try:
             account = self.api.get_account()
@@ -138,9 +143,11 @@ class OrderManager:
             return None
 
     def retrieve_order_by_id(self,order_id):
+        if order_id in self.cache:
+            return self.cache[order_id]
         try:
             order = self.api.get_order(order_id)
-            return {
+            data = {
                 'id': order.id,
                 'symbol': order.symbol,
                 'qty': order.qty,
@@ -150,6 +157,8 @@ class OrderManager:
                 'created at': order.created_at,
                 'filled_at': order.filled_at
             }
+            self.cache[order_id] = data
+            return data
         except Exception as e:
             print(f'Error retrieving order by ID: {e}')
             return None
