@@ -25,3 +25,6 @@
 
 -Sentiment Analysis: Returns a sentiment score regarding any stock via ticker symbol. Achieved using News API and BeautifulSoup to fetch social media articles/news regarding a stock, and returns a sentiment score using VADER. 
 
+
+-Low-level and high-level caching using LRU and cachetool library.
+
