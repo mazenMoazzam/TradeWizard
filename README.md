@@ -8,7 +8,7 @@
 -Risk Management: 
 
 
--Automated Trading: Uses RSI (Relative Strength Index) trading strategy to determine buy and sell signals.
+-Automated Trading: Uses RSI (Relative Strength Index) trading strategy to determine buy and sell signals. 
 
 
 -Real-Time Data Streaming/Trading: Subscribes to real-time stock updates and processes them. Trades stocks in real-time.
